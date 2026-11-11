@@ -1173,7 +1173,19 @@ canvas { display: block; width: 100%; }
 //  input validation, cross-module state, EWI updates,
 //  TF-IDF token visualization, feature importance panel
 // ═══════════════════════════════════════════════════
+let currentLang = 'en';
 
+function changeLanguage(lang) {
+  currentLang = lang;
+  if (lang === 'ar') {
+    logSys('تم تحويل النظام إلى النماذج العربية (Arabic NLP & Local Models)', 'c');
+    // يمكنك هنا تغيير بعض النصوص افتراضياً إذا أردت
+    document.getElementById('iw-text').placeholder = 'أدخل النص العربي هنا للفحص والتصنيف...';
+  } else {
+    logSys('Switched system to English (Real Global Datasets & Models)', 'g');
+    document.getElementById('iw-text').placeholder = 'Enter text here for analysis...';
+  }
+}
 // ── CROSS-MODULE STATE STORE ──────────────────────
 // FIX: modules now share state so Strategic tab can use Risk + Buildup results
 const STATE = {

@@ -470,6 +470,14 @@ canvas { display: block; width: 100%; }
   </div>
 
   <div class="hright">
+     <!-- خيار اختيار اللغة -->
+<div class="fg" style="margin: 0; min-width: 110px;">
+  <label class="flbl" style="font-size: 7px; margin-bottom: 2px;">System Language</label>
+  <select class="fs" id="systemLang" onchange="changeLanguage(this.value)" style="padding: 4px 8px; font-size: 10px;">
+    <option value="en" selected>English (Global/Real)</option>
+    <option value="ar">العربية (محلي/عربي)</option>
+  </select>
+</div>
     <div class="threat-block">
       <div class="tl-lbl">Global Threat</div>
       <div class="tl-val elevated" id="globalThreat">ELEVATED</div>

@@ -11,6 +11,48 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
 
+
+MODELS_DIR = 'models'
+
+def load_nlp_model(lang='en'):
+    """
+    تحميل نموذج معالجة النصوص بناءً على اللغة المحددة
+    """
+    if lang == 'ar':
+        # نموذج خاص بالبيانات العربية
+        model_path = os.path.join(MODELS_DIR, 'nlp_infowar_ar.pkl')
+    else:
+        # النموذج العالمي المبني على بيانات الإنترنت (GDELT / Reuters)
+        model_path = os.path.join(MODELS_DIR, 'nlp_infowar.pkl')
+        
+    # احتياط: إن لم يوجد النموذج العربي، يتم استخدام النموذج الافتراضي
+    if not os.path.exists(model_path):
+        model_path = os.path.join(MODELS_DIR, 'nlp_infowar.pkl')
+        
+    with open(model_path, 'rb') as f:
+        data = pickle.load(f)
+        
+    return data['pipeline'], data.get('labels', [])
+
+# مثال على نقطة النهاية (API Endpoint) في Flask أو FastAPI لاستقبال التحليل:
+# @app.route('/api/analyze', methods=['POST'])
+def analyze_text_endpoint(request_data):
+    text = request_data.get('text', '')
+    lang = request_data.get('lang', 'en') # استلام اللغة (ar أو en)
+    
+    # تحميل النموذج المناسب حسب اللغة
+    pipeline, labels = load_nlp_model(lang)
+    
+    # تنفيذ التنبؤ
+    pred_label_idx = pipeline.predict([text])[0]
+    prediction_result = labels[pred_label_idx]
+    
+    return {
+        'language': lang,
+        'prediction': prediction_result,
+        'status': 'success'
+    }
+
 app = Flask(__name__)
 CORS(app)
 

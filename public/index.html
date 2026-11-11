@@ -1173,18 +1173,46 @@ canvas { display: block; width: 100%; }
 //  input validation, cross-module state, EWI updates,
 //  TF-IDF token visualization, feature importance panel
 // ═══════════════════════════════════════════════════
+// دالة لتغيير اللغة وحفظ الحالة الحالية
 let currentLang = 'en';
 
 function changeLanguage(lang) {
-  currentLang = lang;
-  if (lang === 'ar') {
-    logSys('تم تحويل النظام إلى النماذج العربية (Arabic NLP & Local Models)', 'c');
-    // يمكنك هنا تغيير بعض النصوص افتراضياً إذا أردت
-    document.getElementById('iw-text').placeholder = 'أدخل النص العربي هنا للفحص والتصنيف...';
-  } else {
-    logSys('Switched system to English (Real Global Datasets & Models)', 'g');
-    document.getElementById('iw-text').placeholder = 'Enter text here for analysis...';
-  }
+    currentLang = lang;
+    console.log("System language changed to:", currentLang);
+    
+    // إضافة رسالة في سجل النظام (System Log) لتأكيد التغيير
+    const logBox = document.getElementById('sysLog');
+    if (logBox) {
+        const timeStr = new Date().toTimeString().split(' ')[0];
+        logBox.innerHTML += `<div class="lline"><span class="ltime">${timeStr}</span><span class="lmsg c">Language switched to: ${lang.toUpperCase()}</span></div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+}
+
+// تحديث دالة إرسال الطلب لتحليل الحرب المعلوماتية لترسل اللغة المختارة
+async function runInfoWarAnalysis(text) {
+    try {
+        const response = await fetch('http://127.0.0.1:5001/predict/infowar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: text,
+                lang: currentLang // إرسال اللغة المختارة من القائمة (ar أو en)
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error during InfoWar analysis:", error);
+        return null;
+    }
 }
 // ── CROSS-MODULE STATE STORE ──────────────────────
 // FIX: modules now share state so Strategic tab can use Risk + Buildup results
